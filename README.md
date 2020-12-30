@@ -1,6 +1,8 @@
 # boosh 🔊
 _WebAssembly DSP workbench powered by Rust_
 
+![Example](https://status.david-dm.org/gh/ostenning/boosh.svg)
+
 ### about
 
 boosh is split into webapp and webassembly source in the `webapp` and `dsp` folders respectively. `webapp` is powered by NextJS and `dsp` uses rust with various dsp libraries. 

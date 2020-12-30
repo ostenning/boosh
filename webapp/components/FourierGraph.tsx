@@ -3,7 +3,7 @@ import { Dsp } from '../types/interfaces';
 import * as d3 from 'd3';
 
 const FREQ_MAX = 20e3;
-const SPECTRUM_WIDTH = 512;
+const SPECTRUM_WIDTH = 1024;
 
 interface Props {
   samples: Float32Array;
@@ -26,7 +26,8 @@ const FourierGraph: React.FC<Props> = ({ dsp, samples }) => {
     const line = d3
       .line()
       .x((_, i) => x(i))
-      .y((d) => y(Math.abs((d as unknown) as number)));
+      // .y((d) => y(Math.abs((d as unknown) as number)));
+      .y((d) => y(d as unknown as number));
 
     let svg = d3
       .select('#fourier-graph')
