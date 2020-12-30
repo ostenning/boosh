@@ -19,13 +19,13 @@ pub fn add(a: u32, b: u32) -> u32 {
 }
 
 #[wasm_bindgen]
-pub fn fft(data: &[f64]) -> Box<[f64]> {
-  let mut input: Vec<Complex<f64>> = data.iter().map(|&x| Complex::new(x, 1.0)).collect();
-  let mut output: Vec<Complex<f64>> = vec![Complex::zero(); 1024];
+pub fn fft(data: &[f32]) -> Box<[f32]> {
+  let mut input: Vec<Complex<f32>> = data.iter().map(|&x| Complex::new(x, 1.0)).collect();
+  let mut output: Vec<Complex<f32>> = vec![Complex::zero(); 1024];
   let mut planner = FFTplanner::new(false);
   let fft = planner.plan_fft(1024);
   fft.process(&mut input, &mut output);
-  let vector: Vec<f64> = output.iter().map(|&x| x.re).collect();
+  let vector: Vec<f32> = output.iter().map(|&x| x.re).collect();
   vector.into_boxed_slice()
 }
 

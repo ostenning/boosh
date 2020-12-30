@@ -2,60 +2,72 @@ import React, { useEffect, useState } from 'react';
 import { Dsp } from '../types/interfaces';
 import * as d3 from 'd3';
 
+const FREQ_MAX = 20e3;
+const SPECTRUM_WIDTH = 512;
+
 interface Props {
-    samples: Float32Array;
-    dsp: Dsp;
+  samples: Float32Array;
+  dsp: Dsp;
 }
 
-const Fourier: React.FC<Props> = ({ dsp, samples }) => {
-    const [graph, setGraph] = useState<any>();
+const FourierGraph: React.FC<Props> = ({ dsp, samples }) => {
+  const [graph, setGraph] = useState<any>();
 
-    useEffect(() => {
-        const width = window.innerWidth;
-        const height = window.innerHeight;
+  useEffect(() => {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
 
-        const line = d3.line()
-            .x(function (_, i) { return x(i) })
-            .y(function (d) { return y(d) });
+    let y = d3
+      .scaleLinear()
+      .domain([0, 300])
+      .range([height / 2, 0]);
+    let x = d3.scaleLinear().domain([0, SPECTRUM_WIDTH]).range([0, width]);
 
-        let svg = d3.select("#fourier-graph")
-            .append("svg")
-            .attr("width", width)
-            .attr("height", height);
+    const line = d3
+      .line()
+      .x((_, i) => x(i))
+      .y((d) => y(Math.abs((d as unknown) as number)));
 
-        let x = d3.scaleLinear().domain([0, 512]).range([0, width]);
-        let y = d3.scaleLinear().domain([0, 300]).range([height / 2, 0]);
-        setGraph({ svg, x, y, line });
-    }, []);
+    let svg = d3
+      .select('#fourier-graph')
+      .append('svg')
+      .attr('width', width)
+      .attr('height', height);
 
-    let data;
-    useEffect(() => {
-        if (!samples || !samples.length || !graph) return;
+    // add initial line
+    svg
+      .append('path')
+      .datum([])
+      .attr('fill', 'none')
+      .attr('stroke', 'black')
+      .attr('stroke-width', 2)
+      .attr('d', line);
 
-        data = dsp.fft(samples as unknown as Float64Array);
-        data = data.slice(0, 512);
+    // Draw the axis
+    svg
+      .append('g')
+      .attr('transform', `translate(0,${height - 150})`) // This controls the vertical position of the Axis
+      .call(d3.axisBottom(x).tickFormat(x => `${x.valueOf() * FREQ_MAX / SPECTRUM_WIDTH}`));
 
-        if (graph.svg.select("path").empty()) {
-            graph.svg.append("path")
-                .datum(data)
-                .attr("fill", "none")
-                .attr("stroke", "black")
-                .attr("stroke-width", 2)
-                .attr("d", graph.line)
-        } else {
-            graph.svg.select("path")
-                .datum(data)
-                .attr("d", graph.line)
-        }
-    }, [samples, dsp, graph])
+    setGraph({ svg, line });
+  }, []);
 
-    return (
-        <div>
-            <h3>Fourier</h3>
-            <div id="fourier-graph" />
-            {data}
-        </div>
-    );
-}
+  useEffect(() => {
+    if (!samples || !samples.length || !graph) return;
 
-export default Fourier;
+    let data = dsp.fft(samples);
+    data = data.slice(0, SPECTRUM_WIDTH);
+
+    // update path
+    graph.svg.select('path').datum(data).attr('d', graph.line);
+  }, [samples, dsp, graph]);
+
+  return (
+    <div>
+      <h3>Fourier</h3>
+      <div id="fourier-graph" />
+    </div>
+  );
+};
+
+export default FourierGraph;

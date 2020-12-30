@@ -1,5 +1,5 @@
-import { withRouter } from 'next/router'
-import dynamic from 'next/dynamic'
+import { withRouter } from 'next/router';
+import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import FourierGraph from '../components/FourierGraph';
 import { Dsp } from '../types/interfaces';
@@ -16,15 +16,17 @@ const dspInit = async (): Promise<Dsp> => {
   }
 };
 
-const beginAudio = async (callback: (this: ScriptProcessorNode, ev: AudioProcessingEvent) => any) => {
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+const beginAudio = async (
+  callback: (this: ScriptProcessorNode, ev: AudioProcessingEvent) => any
+) => {
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
   const context = new AudioContext();
   const source = context.createMediaStreamSource(stream);
   const processor = context.createScriptProcessor(1024, 1, 1);
   source.connect(processor);
   processor.connect(context.destination);
   processor.onaudioprocess = callback;
-}
+};
 
 const DspWorkbench = dynamic({
   ssr: false,
@@ -34,18 +36,14 @@ const DspWorkbench = dynamic({
       if (!dsp) return <div>Loading...</div>;
       const [samples, setSamples] = useState<Float32Array>();
 
-      beginAudio(e => {
+      beginAudio((e) => {
         try {
-          // debounce(() => {
           const data = e?.inputBuffer?.getChannelData(0);
-
           if (data && data.length) {
-            // debounce(() => {
-            // console.info('set samples');
-            setSamples(data);
-            // }, 100);
+            debounce(() => {
+              setSamples(data);
+            }, 200);
           }
-          // }, 100);
         } catch (e) {
           console.error(e);
         }
@@ -57,7 +55,7 @@ const DspWorkbench = dynamic({
         </div>
       );
     };
-  }
+  },
 });
 
 const Page = () => {
@@ -68,6 +66,5 @@ const Page = () => {
     </div>
   );
 };
-
 
 export default Page;
