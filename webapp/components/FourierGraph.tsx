@@ -32,8 +32,6 @@ const Fourier: React.FC<Props> = ({ dsp, samples }) => {
     useEffect(() => {
         if (!samples || !samples.length || !graph) return;
 
-        debugger;
-
         data = dsp.fft(samples as unknown as Float64Array);
         data = data.slice(0, 512);
 
