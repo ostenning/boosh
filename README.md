@@ -11,4 +11,4 @@ The rust dsp workbench aims to be lightweight and compatible with embedded envir
 
 ### instructions
 
-To build the dsp libraries targeted for wasm, simply run: `wasm-pack build --target web`. For instruction for NextJS please see `webapp/package.json`.
+To build the dsp libraries targeted for wasm, simply run: `wasm-pack build`. For instruction for NextJS please see `webapp/package.json`.

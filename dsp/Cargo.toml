@@ -9,3 +9,14 @@ crate-type = ["cdylib"]
 
 [dependencies]
 wasm-bindgen = "0.2"
+# dasp = "0.11.0"
+wee_alloc = "0.4.5"
+rustfft = "4.1.0"
+console_error_panic_hook = "0.1.6"
+web-sys = { version = "0.3.46", features = ['console'] }
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false
+
+# [profile.release]
+# opt-level = "s"
