@@ -1,7 +1,8 @@
 # boosh 🔊
 _WebAssembly DSP workbench powered by Rust_
 
-<img src="https://status.david-dm.org/gh/ostenning/boosh.svg" />
+[![GitHub license](https://img.shields.io/github/license/ostenning/boosh)](https://github.com/ostenning/boosh/blob/main/LICENSE) 
+![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/ostenning/boosh)
 
 <hr />
 
