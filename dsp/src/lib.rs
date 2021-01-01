@@ -1,5 +1,6 @@
 extern crate console_error_panic_hook;
 extern crate wee_alloc;
+use js_sys::Math;
 use rustfft::num_traits::Zero;
 use rustfft::{num_complex::Complex, FFTplanner};
 use wasm_bindgen::prelude::*;
@@ -13,36 +14,48 @@ pub fn run() {
   log("wasm loaded");
 }
 
+static mut BUFFER_SIZE: usize = 1024;
+
 #[wasm_bindgen]
-pub fn add(a: u32, b: u32) -> u32 {
-  return a + b;
+pub fn init(size: usize) {
+  unsafe {
+    BUFFER_SIZE = size;
+  }
+
+  log("dsp lib initialized");
+}
+
+pub fn get_buffer_size() -> usize {
+  unsafe {
+    return BUFFER_SIZE;
+  }
 }
 
 #[wasm_bindgen]
 pub fn fft(data: &[f32]) -> Box<[f32]> {
   let mut input: Vec<Complex<f32>> = data.iter().map(|&x| Complex::new(x, 1.0)).collect();
-  let mut output: Vec<Complex<f32>> = vec![Complex::zero(); 2048];
+  let mut output: Vec<Complex<f32>> = vec![Complex::zero(); get_buffer_size()];
   let mut planner = FFTplanner::new(false);
-  let fft = planner.plan_fft(2048);
+  let fft = planner.plan_fft(get_buffer_size());
   fft.process(&mut input, &mut output);
   let vector: Vec<f32> = output.iter().map(|&x| x.re).collect();
   vector.into_boxed_slice()
 }
 
 #[wasm_bindgen]
+pub fn white_noise(data: &[f32]) -> Box<[f32]> {
+  let values: Vec<f32> = data
+    .iter()
+    .map(|&x| {
+      return x + (((Math::random() as f32) * 2.0) - 1.0) * 0.2 as f32;
+    })
+    .collect();
+
+  return values.into_boxed_slice();
+}
+
+#[wasm_bindgen]
 extern "C" {
-  // Use `js_namespace` here to bind `console.log(..)` instead of just
-  // `log(..)`
   #[wasm_bindgen(js_namespace = console)]
   fn log(s: &str);
-
-  // The `console.log` is quite polymorphic, so we can bind it with multiple
-  // signatures. Note that we need to use `js_name` to ensure we always call
-  // `log` in JS.
-  #[wasm_bindgen(js_namespace = console, js_name = log)]
-  fn log_u32(a: u32);
-
-  // Multiple arguments too!
-  #[wasm_bindgen(js_namespace = console, js_name = log)]
-  fn log_many(a: &str, b: &str);
 }

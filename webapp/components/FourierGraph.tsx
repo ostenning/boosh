@@ -3,10 +3,11 @@ import { Dsp } from '../types/interfaces';
 import * as d3 from 'd3';
 
 const FREQ_MAX = 20e3;
-const SPECTRUM_WIDTH = 1024;
+const SPECTRUM_WIDTH = 2048;
+const SAMPLE_SIZE = 4096;
 
 interface Props {
-  samples: Float32Array;
+  samples: number[];
   dsp: Dsp;
 }
 
@@ -54,9 +55,9 @@ const FourierGraph: React.FC<Props> = ({ dsp, samples }) => {
   }, []);
 
   useEffect(() => {
-    if (!samples || !samples.length || !graph) return;
+    if (!samples || samples.length !== SAMPLE_SIZE || !graph) return;
 
-    let data = dsp.fft(samples);
+    let data = dsp.fft(Float32Array.from(samples));
     data = data.slice(0, SPECTRUM_WIDTH);
 
     // update path

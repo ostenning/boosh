@@ -14,6 +14,7 @@ wee_alloc = "0.4.5"
 rustfft = "4.1.0"
 console_error_panic_hook = "0.1.6"
 web-sys = { version = "0.3.46", features = ['console'] }
+js-sys = "0.3.46"
 
 [package.metadata.wasm-pack.profile.release]
 wasm-opt = false
